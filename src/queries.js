@@ -100,7 +100,7 @@ const issue = (sId, bId) => {
 const returnBook = ({serialNo, borrowerId}) => {
   const queries = `
     UPDATE books set is_available = 1 WHERE s_id = ${serialNo};
-    ${insertLog(serialNo, borrowerId, 'borrow')}`;
+    ${insertLog(serialNo, borrowerId, 'return')}`;
   return transaction(queries);
 };
 
@@ -158,6 +158,10 @@ const initializeTables = () => {
   );`;
 };
 
+const selectBorrowersOrderByRegistered = () => {
+  return selectAll('borrowers', 'ORDER BY registered_at DESC');
+};
+
 module.exports = {
   booksQuery,
   insertBorrower,
@@ -171,4 +175,5 @@ module.exports = {
   selectAvailableCopiesByIsbn,
   selectLogBySerialAndBorrower,
   initializeTables,
+  selectBorrowersOrderByRegistered,
 };
