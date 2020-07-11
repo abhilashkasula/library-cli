@@ -2,6 +2,7 @@ const vorpal = require('vorpal')();
 const sqlite3 = require('sqlite3');
 const DB = require('./db');
 const queries = require('./queries');
+const prompt = require('./prompt');
 
 const dbClient = new sqlite3.Database('library.db');
 const db = DB.load(dbClient, queries.initializeTables());
@@ -35,13 +36,13 @@ vorpal.command('register <name>').action((args, cb) => {
   });
 });
 
-vorpal
-  .command('add-book <isbn> <title> <category> <author> <publisher> <copies>')
-  .action((args, cb) => {
-    db.exec(queries.insertBook(args))
-      .then(() => cb(`Successfully added the book with isbn: ${args.isbn}\n`))
+vorpal.command('add-book').action(function (args, cb) {
+  this.prompt(prompt.addBookPrompt(), (res) => {
+    db.exec(queries.insertBook(res))
+      .then(() => cb(`Successfully added the book with isbn: ${res.isbn}\n`))
       .catch((err) => cb('Book already exists\n'));
   });
+});
 
 vorpal.command('add-copies <isbn> <copies>').action(({isbn, copies}, cb) => {
   db.get(queries.selectDetailsWithIsbn(isbn)).then((row) => {
@@ -86,15 +87,13 @@ vorpal.command('clear', 'Clears the screen').action((args, cb) => {
   cb();
 });
 
-const getBooksOptionValues = () => {
-  return {
-    a: 'author',
-    c: 'category',
-    i: 'isbn',
-    t: 'title',
-    p: 'publisher',
-  };
-};
+const getBooksOptionValues = () => ({
+  a: 'author',
+  c: 'category',
+  i: 'isbn',
+  t: 'title',
+  p: 'publisher',
+});
 
 vorpal
   .command('books')
