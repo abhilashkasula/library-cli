@@ -69,7 +69,7 @@ vorpal.command('issue <isbn> <borrowerId>').action(({isbn, borrowerId}, cb) => {
         return cb(chalk.red(`There is no book available with isbn ${isbn}\n`));
       }
       db.exec(queries.issue(row.s_id, borrowerId)).then(() => {
-        const msg = `Successfully issued book with s_id ${row.s_id} to ${borrowerId}`;
+        const msg = `Successfully issued book with s_id ${row.s_id} to ${borrowerId}\n`;
         cb(chalk.green(msg));
       });
     });
